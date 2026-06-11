@@ -48,3 +48,30 @@ export const revokeKey = (id: number) =>
 
 export const listNodes = () =>
   call<{ data: NodeStatus[] }>("/v1/nodes").then((b) => b.data ?? []);
+
+// ---- administração (requer papel direcao) ----
+
+export interface Member {
+  id: string;
+  username: string;
+  email: string;
+  roles: string[] | null;
+}
+
+export const adminListMembers = () =>
+  call<{ data: Member[] }>("/v1/admin/members").then((b) => b.data ?? []);
+
+export const adminGrant = (userId: string, role: string) =>
+  call<void>(`/v1/admin/members/${userId}/roles`, {
+    method: "POST",
+    body: JSON.stringify({ role }),
+  });
+
+export const adminMintMeshKey = () =>
+  call<{ key: string; expires_in_hours: number }>("/v1/admin/mesh-keys", {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+
+export const adminListNodes = () =>
+  call<{ data: NodeStatus[] }>("/v1/admin/nodes").then((b) => b.data ?? []);

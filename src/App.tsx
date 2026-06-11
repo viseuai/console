@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { keycloak } from "./lib/auth";
+import { keycloak, roles } from "./lib/auth";
 import {
+  adminGrant, adminListMembers, adminListNodes, adminMintMeshKey,
   createKey, listKeys, listNodes, revokeKey,
-  type ApiKey, type NodeStatus,
+  type ApiKey, type Member, type NodeStatus,
 } from "./lib/api";
 
 function Marca() {
@@ -181,8 +182,96 @@ function Nos() {
   );
 }
 
+function Administracao() {
+  const [members, setMembers] = useState<Member[]>([]);
+  const [nodes, setNodes] = useState<NodeStatus[]>([]);
+  const [meshKey, setMeshKey] = useState<string | null>(null);
+  const [error, setError] = useState("");
+
+  const refresh = useCallback(() => {
+    adminListMembers().then(setMembers).catch((e) => setError(String(e)));
+    adminListNodes().then(setNodes).catch(() => {});
+  }, []);
+  useEffect(refresh, [refresh]);
+
+  return (
+    <section aria-labelledby="t-admin" className="flex flex-col gap-6">
+      <div>
+        <h2 id="t-admin" className="font-[family-name:var(--font-display)] text-xl font-bold">Administração</h2>
+        <p className="mt-1 text-ink-2">
+          Gestão reservada à direção. Cada ação fica registada.
+        </p>
+        {error && <p role="alert" className="mt-2 text-sm text-error">{error}</p>}
+      </div>
+
+      <div>
+        <h3 className="font-semibold">Membros</h3>
+        <ul className="mt-2 flex flex-col gap-2">
+          {members.map((m) => {
+            const isMember = m.roles?.includes("member");
+            return (
+              <li key={m.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3">
+                <span className="font-medium">{m.username}</span>
+                <span className="text-sm text-ink-2">{m.email}</span>
+                <span className="text-sm text-ink-2">{(m.roles ?? []).join(" · ") || "sem papéis"}</span>
+                {!isMember && (
+                  <button
+                    onClick={() => adminGrant(m.id, "member").then(refresh).catch((e) => setError(String(e)))}
+                    className="ml-auto rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-on-accent hover:bg-accent-hover"
+                  >
+                    Aprovar como membro
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="font-semibold">Chaves de acesso à rede privada</h3>
+        <p className="mt-1 text-sm text-ink-2">
+          Para entregar a novos operadores de nós. Uso único, válida 72 horas.
+        </p>
+        <button
+          onClick={() => adminMintMeshKey().then((r) => setMeshKey(r.key)).catch((e) => setError(String(e)))}
+          className="mt-2 rounded-lg bg-accent px-4 py-2 font-semibold text-on-accent hover:bg-accent-hover"
+        >
+          Criar chave de rede
+        </button>
+        {meshKey && (
+          <div className="mt-3 rounded-lg border border-amber/40 bg-muted p-3">
+            <p className="text-sm">Entregue esta chave ao operador. Não volta a ser mostrada.</p>
+            <div className="mt-2 flex items-center gap-2">
+              <code className="min-w-0 flex-1 truncate text-sm">{meshKey}</code>
+              <Copiar text={meshKey} />
+              <button onClick={() => setMeshKey(null)} className="text-sm text-ink-2 underline">Fechar</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h3 className="font-semibold">Todos os nós da rede</h3>
+        <ul className="mt-2 flex flex-col gap-2">
+          {nodes.map((n) => (
+            <li key={n.node} className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3">
+              <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${n.online ? "bg-green" : "bg-line-strong"}`} />
+              <span className="font-medium">{n.node}</span>
+              <span className={`text-sm ${n.online ? "text-green" : "text-ink-2"}`}>{n.online ? "ativo" : "inativo"}</span>
+              <span className="ml-auto truncate text-sm text-ink-2">{n.models.join(" · ")}</span>
+            </li>
+          ))}
+          {nodes.length === 0 && <li className="text-ink-2">Sem nós registados.</li>}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
-  const [tab, setTab] = useState<"chaves" | "nos">("chaves");
+  const [tab, setTab] = useState<"chaves" | "nos" | "admin">("chaves");
+  const isDirecao = roles().includes("direcao");
 
   const tabClass = (active: boolean) =>
     `rounded-lg px-4 py-2 font-medium ${
@@ -213,9 +302,18 @@ export default function App() {
         <button className={tabClass(tab === "nos")} onClick={() => setTab("nos")} aria-current={tab === "nos"}>
           Nós de computação
         </button>
+        {isDirecao && (
+          <button className={tabClass(tab === "admin")} onClick={() => setTab("admin")} aria-current={tab === "admin"}>
+            Administração
+          </button>
+        )}
       </nav>
 
-      <main className="pb-12">{tab === "chaves" ? <Chaves /> : <Nos />}</main>
+      <main className="pb-12">
+        {tab === "chaves" && <Chaves />}
+        {tab === "nos" && <Nos />}
+        {tab === "admin" && isDirecao && <Administracao />}
+      </main>
     </div>
   );
 }

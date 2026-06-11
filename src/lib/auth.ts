@@ -24,3 +24,10 @@ export function displayName(): string {
   const t = keycloak.tokenParsed as Record<string, unknown> | undefined;
   return (t?.preferred_username as string) ?? "membro";
 }
+
+export function roles(): string[] {
+  const t = keycloak.tokenParsed as
+    | { realm_access?: { roles?: string[] } }
+    | undefined;
+  return t?.realm_access?.roles ?? [];
+}

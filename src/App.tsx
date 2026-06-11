@@ -151,17 +151,30 @@ function Nos() {
       <div className="rounded-xl border border-line bg-surface p-4">
         <h3 className="font-semibold">Como ligar o seu nó</h3>
         <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-ink-2">
-          <li>Peça acesso à rede privada da associação (geral@viseuai.org) e ligue o seu computador com a chave que recebe.</li>
-          <li>Instale um motor de inferência compatível (por exemplo, Ollama ou llama.cpp; em Mac, MLX).</li>
-          <li>Descarregue o programa viseu-agent para o seu sistema (macOS, Windows ou Linux).</li>
           <li>
-            Execute, substituindo a chave e o endereço do seu nó na rede:
+            Tenha um motor de inferência a funcionar. O{" "}
+            <a href="https://ollama.com" className="text-accent underline underline-offset-2">Ollama</a>{" "}
+            é o mais simples e pode ficar como está: o agente faz a ponte,
+            sem expor nada no seu computador.
+          </li>
+          <li>
+            Descarregue o{" "}
+            <a href="https://github.com/viseuai/agent/releases" className="text-accent underline underline-offset-2">
+              viseu-agent
+            </a>{" "}
+            para o seu sistema (macOS, Windows ou Linux). Não precisa de
+            instalar mais nada.
+          </li>
+          <li>Crie acima a sua chave de nó e peça a chave de rede à direção (geral@viseuai.org).</li>
+          <li>
+            Execute:
             <pre className="mt-2 overflow-x-auto rounded-lg bg-muted p-3 text-xs leading-relaxed text-ink">{`viseu-agent \\
   -key vsk_a_sua_chave_de_no \\
-  -advertise-url http://SEU_IP_DE_REDE:8090 \\
-  -engine-cmd "mlx_lm.server --model mlx-community/Qwen2.5-3B-Instruct-4bit --host 0.0.0.0 --port 8090"`}</pre>
+  -mesh-key chave_de_rede \\
+  -engine-url http://localhost:11434`}</pre>
+            A chave de rede só é necessária na primeira execução.
           </li>
-          <li>O nó aparece abaixo como ativo passado meio minuto. Para parar de partilhar, basta encerrar o programa.</li>
+          <li>O nó aparece abaixo como ativo passado meio minuto, com todos os modelos do seu motor. Para parar de partilhar, basta Ctrl+C.</li>
         </ol>
       </div>
 

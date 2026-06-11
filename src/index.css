@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+/* Viseu AI Lab · design tokens (docs/DESIGN_SYSTEM.md) */
+:root {
+  --bg: #f7f5f2; /* Estrela */
+  --surface: #ffffff;
+  --muted: #edeae6;
+  --text: #1e1b17; /* Xisto */
+  --text-2: #5c5650;
+  --accent: #6b5b8a; /* Touriga */
+  --accent-hover: #574a72;
+  --on-accent: #ffffff;
+  --amber: #7a5b1e; /* Dão, text-safe variant */
+  --green: #3a7a60; /* Mondego */
+  --error: #9e3a30;
+  --border: #d2cec9;
+  --border-strong: #ada8a1;
+  --focus: #574a72;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1816;
+    --surface: #252220;
+    --muted: #302d2a;
+    --text: #e8e5e1;
+    --text-2: #9e9890;
+    --accent: #9b89b8;
+    --accent-hover: #b4a5cc;
+    --on-accent: #1e1b17;
+    --amber: #d4a856;
+    --green: #6bb897;
+    --error: #e07d72;
+    --border: #3c3835;
+    --border-strong: #5c5650;
+    --focus: #ffffff;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-ink: var(--text);
+  --color-ink-2: var(--text-2);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-amber: var(--amber);
+  --color-green: var(--green);
+  --color-error: var(--error);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --font-display: "Space Grotesk", "Avenir Next", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", -apple-system, system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

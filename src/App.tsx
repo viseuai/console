@@ -269,9 +269,31 @@ function Administracao() {
   );
 }
 
+function AguardaAprovacao() {
+  return (
+    <div className="mx-auto flex h-dvh max-w-md flex-col items-center justify-center px-6 text-center">
+      <Marca />
+      <h1 className="mt-5 font-[family-name:var(--font-display)] text-2xl font-bold">
+        A sua conta foi criada
+      </h1>
+      <p className="mt-3 text-ink-2">
+        O acesso à consola aguarda aprovação da direção da associação.
+      </p>
+      <p className="mt-2 text-sm text-ink-2">Dúvidas? Escreva para geral@viseuai.org.</p>
+      <button
+        onClick={() => keycloak.logout({ redirectUri: "https://viseuai.org" })}
+        className="mt-6 rounded-lg border border-line bg-surface px-4 py-2 font-medium text-ink-2 hover:border-line-strong hover:text-ink"
+      >
+        Sair
+      </button>
+    </div>
+  );
+}
+
 export default function App() {
   const [tab, setTab] = useState<"chaves" | "nos" | "admin">("chaves");
   const isDirecao = roles().includes("direcao");
+  if (!roles().includes("member")) return <AguardaAprovacao />;
 
   const tabClass = (active: boolean) =>
     `rounded-lg px-4 py-2 font-medium ${
